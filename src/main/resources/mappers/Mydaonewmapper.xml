@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--联合查询mapper-->
+<mapper namespace="com.sx.ssqMVC.dao.MyDAONew">
+
+    <!--多表连接查询 -->
+    <resultMap id="rwsMapper" type="com.sx.ssqMVC.bean.RwsBean">
+        <!-- column是数据库的列名   property是实体类的属性名
+          这种配置可以避免实体类属性名与数据库列名不一致的问题   -->
+        <id column="task_id" property="task_id" />
+        <result column="task_des" property="task_des" />
+
+        <!--关联属性的映射关系-->
+        <collection property="jcds" ofType="com.sx.ssqMVC.bean.CheckBean">
+            <id column="inspect_id" property="inspect_id" />
+            <result column="ath_id" property="ath_id" />
+            <result column="task_id" property="task_id" />
+        </collection>
+    </resultMap>
+
+    <!--联查-->
+    <select id="selectRwsById" resultMap="rwsMapper">
+        select ins.task_id,ins.task_des,ad.inspect_id,ad.ath_id,ad.task_id
+        from ins_task ins left join ad_check ad on ins.task_id = ad.task_id
+        where ins.task_id = #{task_id}
+    </select>
+    <!-- **************************************************************************** -->
+
+    <!--多表单独查询-->
+    <select id="selectCheckByRwsid" resultType="com.sx.ssqMVC.bean.CheckBean">
+        select inspect_id,ath_id,task_id from ad_check where task_id = #{task_id}
+    </select>
+
+    <resultMap id="rwsMapper" type="com.sx.ssqMVC.bean.RwsBean">
+        <id column="task_id" property="task_id" />
+        <result column="task_des" property="task_des" />
+
+        <!--关联属性的映射关系-->
+        <!--集合的数据来自指定的select查询
+            而该select的动态查询条件来自column -->
+        <collection property = "jcds"
+                    ofType = "com.sx.ssqMVC.bean.CheckBean"
+                    select = "selectCheckByRwsid"
+                    column = "task_id" />
+    </resultMap>
+    <select id="selectRwsById" resultMap="rwsMapper">
+        select ins.task_id,ins.task_des
+        from ins_task
+        where ins.task_id = #{task_id}
+    </select>
+
+</mapper>

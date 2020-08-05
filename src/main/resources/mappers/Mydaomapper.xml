@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sx.ssqMVC.dao.MyDAO">
+    <insert id="insertRwsxx" >
+            insert into ins_task (task_id,task_des)
+            VALUES (#{task_id},#{task_des})
+    </insert>
+
+
+    <delete id="deleteRwsxxById"  >
+        delete from ins_task where task_id = #{task_id}
+    </delete>
+
+    <update id="updateRwsById">
+        update ins_task set task_des = #{task_des} where task_id = #{task_id}
+    </update>
+
+    <select id="findAll" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task
+    </select>
+
+    <select id="selectRwsById" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task where task_id = #{task_id}
+    </select>
+
+    <select id="selectRwsByDes" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from  ins_task where task_des like concat('%',#{task_des},'%')
+    </select>
+
+    <!--if动态语句查询-->
+    <select id="rwsxxif" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task
+        where 1 = 1
+        <if test=" task_id !=null or task_id !='' ">
+            AND task_id = #{task_id}
+        </if>
+
+        <if test=" task_des != null and task_des !='' ">
+            AND task_des like concat('%',#{task_des},'%')
+        </if>
+
+    </select>
+
+
+    <!--where动态语句查询-->
+    <select id="rwsxxwhere" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task
+        <where>
+            <!--第一个条件的and 可写 可不写 -->
+            <if test=" task_id !=null or task_id !='' ">
+
+                AND task_id = #{task_id}
+            </if>
+            <!--第二个条件的and 必须写 -->
+            <if test=" task_des != null and task_des !='' ">
+                AND task_des like concat('%',#{task_des},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--choose动态语句查询-->
+    <select id="rwsxxchoose" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task
+        <where>
+            <choose>
+                <when test=" task_id !=null and task_id !='' ">
+                    AND task_id = #{task_id}
+                </when>
+                <when test=" task_des != null and task_des !='' ">
+                    AND task_des like concat('%',#{task_des},'%')
+                </when>
+                <otherwise>
+                    1 != 1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <!--foreach  array动态语句查询-->
+    <select id="rwsxxforeach" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task
+        <!--array不能随便写  必须写成array，表示数组 -->
+        <if test="array!=null and array.length >0">
+          where task_id IN
+            <!--指定遍历的集合类型为数组-->
+            <foreach collection="array" open="(" close=")" item="myid" separator=",">
+            #{myid}
+            </foreach>
+        </if>
+    </select>
+
+    <!--foreach  list动态语句查询-->
+    <select id="rwsxxforeachlist" resultType="com.sx.ssqMVC.bean.RwsBean">
+        select * from ins_task
+        <!--array不能随便写  必须写成array，表示数组 -->
+        <if test="list!=null and list.size>0">
+            where task_id IN
+            <!--指定遍历的集合类型为list-->
+            <foreach collection="list" open="(" close=")" item="myid" separator=",">
+                #{myid}
+            </foreach>
+        </if>
+    </select>
+
+
+    <!--自定义sql片段-->
+    <sql id="selectHead">
+        SELECT  * from  ins_task
+    </sql>
+
+    <!--遍历泛型为自定义类型的list  引入自定义sql-->
+    <select id="rwsxxSqlFragment" resultType="com.sx.ssqMVC.bean.RwsBean" >
+       <include refid="selectHead" />
+          <if test="list!=null and list.size > 0">
+              where task_id IN
+              <foreach collection="list" open="(" close=")" item="tj" separator=",">
+                #{tj.task_id}
+              </foreach>
+          </if>
+    </select>
+
+
+</mapper>
