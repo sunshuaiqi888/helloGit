@@ -3,7 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sx.ssqMVC.dao.MyDAO">
-    <insert id="insertRwsxx" >
+
+
+    <!-- flushCache清除二级缓存，默认不写为true-->
+    <insert id="insertRwsxx"  flushCache="false">
             insert into ins_task (task_id,task_des)
             VALUES (#{task_id},#{task_des})
     </insert>

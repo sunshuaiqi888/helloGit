@@ -5,6 +5,37 @@
 <!--联合查询mapper-->
 <mapper namespace="com.sx.ssqMVC.dao.MyDAONew">
 
+   <!-- myBatis 查询缓存的作用域是根据映射文件 mapper 的 namespace 划分的，相同
+        namespace的mapper查询数据存放在同一个缓存区域。不同namespace下的数据互不干扰。
+        无论是一级缓存还是二级缓存，都是按照 namespace 进行分别存放的。
+        但一、二级缓存的不同之处在于，SqlSession 一旦关闭，则 SqlSession 中的数据将不存
+        在，即一级缓存就不覆存在。而二级缓存的生命周期会与整个应用同步，与 SqlSession 是否
+        关闭无关。
+        使用二级缓存的目的，不是共享数据，因为 MyBatis 从缓存中读取数据的依据是 SQL 的
+        id，而非查询出的对象。所以，二级缓存中的数据不是为了在多个查询之间共享（所有查询
+        中只要查询结果中存在该对象的，就直接从缓存中读取，这是对数据的共享，Hibernate 中
+        的缓存就是为了共享，但 MyBaits 的不是），而是为了延长该查询结果的保存时间，提高系
+        统性能。
+
+        增删改操作，无论是否进行提交 sqlSession.commit()，均会清空一级、二级查询缓存，使查询再次从 DB 中 select。
+
+        若要使某个增、删或改操作不清空二级缓存，则需要在其<insert/>或<delete/>或<update/>
+        中添加属性 flushCache=”false”，默认为 true。
+
+        myBatis 内置的二级缓存为 org.apache.ibatis.cache.impl.PerpetualCache。  -->
+
+    <!--二级缓存的用法:
+         eviction：逐出策略。当二级缓存中的对象达到最大值时，就需要通过逐出策略将缓存
+                    中的对象移出缓存。默认为 LRU。常用的策略有：
+             FIFO：First In First Out，先进先出
+             LRU：Least Recently Used，未被使用时间最长的
+         flushInterval：刷新缓存的时间间隔，单位毫秒。这里的刷新缓存即清空缓存。一般不指
+                         定，即当执行增删改时刷新缓存。
+         readOnly：设置缓存中数据是否只读。只读的缓存会给所有调用者返回缓存对象的相同
+                    实例，因此这些对象不能被修改，这提供了很重要的性能优势。但读写的缓存会返回缓
+                    存对象的拷贝。这会慢一些，但是安全，因此默认是 false。
+         size：二级缓存中可以存放的最多对象个数。默认为 1024 个。-->
+    <cache eviction="FIFO" flushInterval="10800000" readOnly="true" size="512"/>
     <!--多表连接查询 -->
     <resultMap id="rwsMapper" type="com.sx.ssqMVC.bean.RwsBean">
         <!-- column是数据库的列名   property是实体类的属性名
@@ -28,8 +59,15 @@
     </select>
     <!-- **************************************************************************** -->
 
+    <!--
+        所谓局部关闭是指，整个应用的二级缓存是开启的，但只是针对于某个<select/>查询，
+        不使用二级缓存。此时可以单独只关闭该<select/>标签的二级缓存。
+        在该要关闭二级缓存的<select/>标签中，将其属性 useCache 设置为 false，即可关闭该
+        查询的二级缓存。该属性默认为 true，即每个<select/>查询的二级缓存默认是开启的。
+    -->
+
     <!--多表单独查询-->
-    <select id="selectCheckByRwsid" resultType="com.sx.ssqMVC.bean.CheckBean">
+    <select id="selectCheckByRwsid"  useCache="false" resultType="com.sx.ssqMVC.bean.CheckBean">
         select inspect_id,ath_id,task_id from ad_check where task_id = #{task_id}
     </select>
 

@@ -1,9 +1,11 @@
 package com.sx.ssqMVC.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by sunsq on 2020/8/4.
  */
-public class CheckBean {
+public class CheckBean implements Serializable {
 
     private String inspect_id;
     private String task_id;

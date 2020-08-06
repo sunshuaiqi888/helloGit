@@ -7,6 +7,11 @@
     <!--注册属性文件-->
     <properties resource="jdbc.properties"/>
 
+    <settings>
+        <!--设置全局，二级缓存不启用，默认为true-->
+        <setting name="cacheEnabled" value="false" />
+    </settings>
+
     <!--配置mybatis 的 运行环境-->
     <environments default="zdyMyEvn">
         <environment id="zdyMyEvn">
@@ -19,9 +24,44 @@
             </dataSource>
         </environment>
     </environments>
+
     <!--注册映射文件-->
     <mappers>
         <mapper resource="mappers/Mydaomapper.xml"/>
         <mapper resource="mappers/Mydaonewmapper.xml"/>
     </mappers>
+
+
 </configuration>
+<!--
+    MyBatis 的配置文件包含了会深bai深影响 MyBatis 行为的设置和属性信du息。zhi 配置文档的顶层结构如下：
+
+    注意顺序不能错!!!!!!!!!!!!
+
+    configuration（配dao置）：
+
+    environment（环境变量）
+
+    transactionManager（事务管理器）
+
+    dataSource（数据源）
+
+    properties（属性）
+
+    settings（设置）
+
+    typeAliases（类型别名）
+
+    typeHandlers（类型处理器）
+
+    objectFactory（对象工厂）
+
+    plugins（插件）
+
+    environments（环境配置）
+
+    databaseIdProvider（数据库厂商标识）
+
+    mappers（映射器）
+
+-->
